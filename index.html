@@ -873,8 +873,9 @@
           // ========================
           // FORMATAR TODOS OS "ALTER TABLE ... ADD ..."
           // ========================
+          // Aceita ; ou quebra de linha ou fim do texto
           const alterTableRegexGlobal =
-            /ALTER TABLE\s+\[([^\]]+)\]\s+ADD\s+([\s\S]*?);/gi;
+            /ALTER TABLE\s+\[([^\]]+)\]\s+ADD\s+([\s\S]*?)(?:;|\n(?=ALTER TABLE|\s*CALL|$)|$)/gi;
           let alterMatch;
           while ((alterMatch = alterTableRegexGlobal.exec(input)) !== null) {
             const tabela = alterMatch[1];
@@ -895,9 +896,10 @@
 
           // ========================
           // FORMATAR TODOS OS "EXEC sp_rename '[Tabela].ColAnt', 'ColNova';"
+          // Também aceita CALL sp_rename
           // ========================
           const renameRegex =
-            /EXEC\s+sp_rename\s+'\[([^\]]+)\]\.([^\']+)'\s*,\s*'([^\']+)';/gi;
+            /(?:EXEC|CALL)\s+sp_rename\s+'\[([^\]]+)\]\.([^\']+)'\s*,\s*'([^\']+)'/gi;
           let renameMatch;
           while ((renameMatch = renameRegex.exec(input)) !== null) {
             const tabela = renameMatch[1];
@@ -918,7 +920,7 @@
           // ALTER TABLE ... DROP COLUMN ...
           // ========================
           const dropRegex =
-            /ALTER TABLE\s+\[([^\]]+)\]\s+DROP COLUMN\s+([\s\S]*?);/gi;
+            /ALTER TABLE\s+\[([^\]]+)\]\s+DROP COLUMN\s+([\s\S]*?)(?:;|\n(?=ALTER TABLE|\s*CALL|$)|$)/gi;
           let dropMatch;
           while ((dropMatch = dropRegex.exec(input)) !== null) {
             const tabela = dropMatch[1];
@@ -930,7 +932,7 @@
 
             colunas.forEach((coluna) => {
               linhas.push(
-                `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] DROP COLUMN [${coluna}]; "`
+          `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] DROP COLUMN [${coluna}]; "`
               );
               linhas.push(`&sqlCollection.Add(&sql)`);
               linhas.push(``);
@@ -938,10 +940,28 @@
           }
 
           // ========================
+          // ALTER TABLE ... ALTER COLUMN ...
+          // ========================
+          const alterColumnRegex =
+            /ALTER TABLE\s+\[([^\]]+)\]\s+ALTER COLUMN\s+\[([^\]]+)\]\s+([A-Z]+(?:\([^)]+\))?)\s+NULL/gi;
+          let alterColMatch;
+          while ((alterColMatch = alterColumnRegex.exec(input)) !== null) {
+            const tabela = alterColMatch[1];
+            const coluna = alterColMatch[2];
+            const tipo = alterColMatch[3];
+
+            linhas.push(
+              `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] ALTER COLUMN [${coluna}] ${tipo} NULL; "`
+            );
+            linhas.push(`&sqlCollection.Add(&sql)`);
+            linhas.push(``);
+          }
+
+          // ========================
           // CREATE TABLE ...
           // ========================
           const createTableRegex =
-            /CREATE TABLE\s+\[([^\]]+)\]\s*\(([\s\S]*?)\);/gi;
+            /CREATE TABLE\s+\[([^\]]+)\]\s*\(([\s\S]*?)\)(?:;|\n(?=CREATE TABLE|$)|$)/gi;
           let createMatch;
           while ((createMatch = createTableRegex.exec(input)) !== null) {
             const tabela = createMatch[1];
@@ -961,8 +981,8 @@
             linhasTabela.forEach((linha, idx) => {
               let final = idx === linhasTabela.length - 1 ? " " : " ";
               const linhaFormatada = linha
-                .replace(/\s+/g, " ")
-                .replace(/,$/, ""); // remove múltiplos espaços e vírgula final
+          .replace(/\s+/g, " ")
+          .replace(/,$/, ""); // remove múltiplos espaços e vírgula final
               linhas.push(`&sql += "   ${linhaFormatada}${final}"`);
             });
 
