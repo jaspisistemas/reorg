@@ -868,12 +868,13 @@
 
         function formatarSQL() {
           const input = sqlInput.value;
-          const linhas = [];
+          const instrucoes = [];
 
           // ========================
-          // FORMATAR TODOS OS "ALTER TABLE ... ADD ..."
+          // Coletar todas as instruções e identificar tabela
           // ========================
-          // Aceita ; ou quebra de linha ou fim do texto
+
+          // ALTER TABLE ... ADD ...
           const alterTableRegexGlobal =
             /ALTER TABLE\s+\[([^\]]+)\]\s+ADD\s+([\s\S]*?)(?:;|\n(?=ALTER TABLE|\s*CALL|$)|$)/gi;
           let alterMatch;
@@ -887,17 +888,19 @@
             while ((colunaMatch = colunasRegex.exec(corpoAdd)) !== null) {
               const nomeColuna = colunaMatch[1];
               const tipo = colunaMatch[2];
-              const linha = `&sql = " IF NOT EXISTS (SELECT * FROM sys.columns WHERE name = '${nomeColuna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] ADD [${nomeColuna}] ${tipo} NULL; "`;
-              linhas.push(linha);
-              linhas.push(`&sqlCollection.Add(&sql)`);
-              linhas.push(``);
+              instrucoes.push({
+                tabela,
+                tipo: "add",
+                conteudo: [
+                  `&sql = " IF NOT EXISTS (SELECT * FROM sys.columns WHERE name = '${nomeColuna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] ADD [${nomeColuna}] ${tipo} NULL; "`,
+                  `&sqlCollection.Add(&sql)`,
+                  ``
+                ]
+              });
             }
           }
 
-          // ========================
-          // FORMATAR TODOS OS "EXEC sp_rename '[Tabela].ColAnt', 'ColNova';"
-          // Também aceita CALL sp_rename
-          // ========================
+          // EXEC/CALL sp_rename '[Tabela].ColAnt', 'ColNova';
           const renameRegex =
             /(?:EXEC|CALL)\s+sp_rename\s+'\[([^\]]+)\]\.([^\']+)'\s*,\s*'([^\']+)'/gi;
           let renameMatch;
@@ -905,20 +908,19 @@
             const tabela = renameMatch[1];
             const colunaAntiga = renameMatch[2];
             const colunaNova = renameMatch[3];
-
-            linhas.push(
-              `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${colunaAntiga}' AND object_id = OBJECT_ID('${tabela}')) "`
-            );
-            linhas.push(
-              `&sql += " BEGIN EXEC sp_rename '[${tabela}].${colunaAntiga}', '${colunaNova}', 'COLUMN'; END; "`
-            );
-            linhas.push(`&sqlCollection.Add(&sql)`);
-            linhas.push(``);
+            instrucoes.push({
+              tabela,
+              tipo: "rename",
+              conteudo: [
+                `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${colunaAntiga}' AND object_id = OBJECT_ID('${tabela}')) "`,
+                `&sql += " BEGIN EXEC sp_rename '[${tabela}].${colunaAntiga}', '${colunaNova}', 'COLUMN'; END; "`,
+                `&sqlCollection.Add(&sql)`,
+                ``
+              ]
+            });
           }
 
-          // ========================
           // ALTER TABLE ... DROP COLUMN ...
-          // ========================
           const dropRegex =
             /ALTER TABLE\s+\[([^\]]+)\]\s+DROP COLUMN\s+([\s\S]*?)(?:;|\n(?=ALTER TABLE|\s*CALL|$)|$)/gi;
           let dropMatch;
@@ -931,17 +933,19 @@
               .map((col) => col.replace(/[\[\]]/g, ""));
 
             colunas.forEach((coluna) => {
-              linhas.push(
-          `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] DROP COLUMN [${coluna}]; "`
-              );
-              linhas.push(`&sqlCollection.Add(&sql)`);
-              linhas.push(``);
+              instrucoes.push({
+                tabela,
+                tipo: "drop",
+                conteudo: [
+                  `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] DROP COLUMN [${coluna}]; "`,
+                  `&sqlCollection.Add(&sql)`,
+                  ``
+                ]
+              });
             });
           }
 
-          // ========================
           // ALTER TABLE ... ALTER COLUMN ...
-          // ========================
           const alterColumnRegex =
             /ALTER TABLE\s+\[([^\]]+)\]\s+ALTER COLUMN\s+\[([^\]]+)\]\s+([A-Z]+(?:\([^)]+\))?)\s+NULL/gi;
           let alterColMatch;
@@ -949,17 +953,18 @@
             const tabela = alterColMatch[1];
             const coluna = alterColMatch[2];
             const tipo = alterColMatch[3];
-
-            linhas.push(
-              `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] ALTER COLUMN [${coluna}] ${tipo} NULL; "`
-            );
-            linhas.push(`&sqlCollection.Add(&sql)`);
-            linhas.push(``);
+            instrucoes.push({
+              tabela,
+              tipo: "alter",
+              conteudo: [
+                `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] ALTER COLUMN [${coluna}] ${tipo} NULL; "`,
+                `&sqlCollection.Add(&sql)`,
+                ``
+              ]
+            });
           }
 
-          // ========================
           // CREATE TABLE ...
-          // ========================
           const createTableRegex =
             /CREATE TABLE\s+\[([^\]]+)\]\s*\(([\s\S]*?)\)(?:;|\n(?=CREATE TABLE|$)|$)/gi;
           let createMatch;
@@ -967,10 +972,10 @@
             const tabela = createMatch[1];
             const corpo = createMatch[2].trim();
 
-            linhas.push(
-              `&sql = " IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = '${tabela}') "`
-            );
-            linhas.push(`&sql += " CREATE TABLE [${tabela}] ( "`);
+            const conteudo = [
+              `&sql = " IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = '${tabela}') "`,
+              `&sql += " CREATE TABLE [${tabela}] ( "`
+            ];
 
             // Processa cada linha dentro do corpo
             const linhasTabela = corpo
@@ -981,19 +986,23 @@
             linhasTabela.forEach((linha, idx) => {
               let final = idx === linhasTabela.length - 1 ? " " : " ";
               const linhaFormatada = linha
-          .replace(/\s+/g, " ")
-          .replace(/,$/, ""); // remove múltiplos espaços e vírgula final
-              linhas.push(`&sql += "   ${linhaFormatada}${final}"`);
+                .replace(/\s+/g, " ")
+                .replace(/,$/, ""); // remove múltiplos espaços e vírgula final
+              conteudo.push(`&sql += "   ${linhaFormatada}${final}"`);
             });
 
-            linhas.push(`&sql += " ); "`);
-            linhas.push(`&sqlCollection.Add(&sql)`);
-            linhas.push(``);
+            conteudo.push(`&sql += " ); "`);
+            conteudo.push(`&sqlCollection.Add(&sql)`);
+            conteudo.push(``);
+
+            instrucoes.push({
+              tabela,
+              tipo: "create",
+              conteudo
+            });
           }
 
-          // ========================
           // CREATE NONCLUSTERED INDEX ...
-          // ========================
           const indexRegex =
             /CREATE\s+NONCLUSTERED\s+INDEX\s+\[([^\]]+)\]\s+ON\s+\[([^\]]+)\]\s*\((.*?)\)\s*;?/gi;
           let indexMatch;
@@ -1008,14 +1017,44 @@
               .join(", ");
 
             let linhaIndex = `&sql = " IF NOT EXISTS (Select * from sys.indexes where name = '${nomeIndex}') `;
-            linhaIndex += `CREATE NONCLUSTERED INDEX [${nomeIndex}] ON [${tabela}] (${colunasRaw})"`; // já com colchetes
-            linhas.push(linhaIndex);
-            linhas.push("&sqlCollection.Add(&sql)");
+            linhaIndex += `CREATE NONCLUSTERED INDEX [${nomeIndex}] ON [${tabela}] (${colunasRaw})"`;
+
+            instrucoes.push({
+              tabela,
+              tipo: "index",
+              conteudo: [
+                linhaIndex,
+                "&sqlCollection.Add(&sql)"
+              ]
+            });
           }
 
+          // ========================
+          // Agrupar por tabela
+          // ========================
+          // Mantém a ordem de aparição das tabelas
+          const tabelaOrdem = [];
+          const agrupado = {};
+
+          instrucoes.forEach((inst) => {
+            if (!agrupado[inst.tabela]) {
+              agrupado[inst.tabela] = [];
+              tabelaOrdem.push(inst.tabela);
+            }
+            agrupado[inst.tabela].push(inst);
+          });
+
+          // Montar linhas agrupadas
+          const linhas = [];
+          tabelaOrdem.forEach((tabela) => {
+            agrupado[tabela].forEach((inst) => {
+              linhas.push(...inst.conteudo);
+            });
+          });
+
           return linhas.length > 0
-              ? linhas.join("\n")
-              : "Nenhuma instrução reconhecida.";
+            ? linhas.join("\n")
+            : "Nenhuma instrução reconhecida.";
         }
 
         function clearInput() {
