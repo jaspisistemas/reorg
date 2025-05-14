@@ -1,0 +1,1167 @@
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formatador de SQL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql-formatter/4.0.2/sql-formatter.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f0f4f8;
+      }
+
+      pre,
+      code,
+      textarea {
+        font-family: "Fira Code", monospace;
+      }
+
+      .code-area {
+        min-height: 300px;
+      }
+    </style>
+    <style>
+      *,
+      ::before,
+      ::after {
+        --tw-border-spacing-x: 0;
+        --tw-border-spacing-y: 0;
+        --tw-translate-x: 0;
+        --tw-translate-y: 0;
+        --tw-rotate: 0;
+        --tw-skew-x: 0;
+        --tw-skew-y: 0;
+        --tw-scale-x: 1;
+        --tw-scale-y: 1;
+        --tw-pan-x: ;
+        --tw-pan-y: ;
+        --tw-pinch-zoom: ;
+        --tw-scroll-snap-strictness: proximity;
+        --tw-gradient-from-position: ;
+        --tw-gradient-via-position: ;
+        --tw-gradient-to-position: ;
+        --tw-ordinal: ;
+        --tw-slashed-zero: ;
+        --tw-numeric-figure: ;
+        --tw-numeric-spacing: ;
+        --tw-numeric-fraction: ;
+        --tw-ring-inset: ;
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-color: rgb(59 130 246 / 0.5);
+        --tw-ring-offset-shadow: 0 0 #0000;
+        --tw-ring-shadow: 0 0 #0000;
+        --tw-shadow: 0 0 #0000;
+        --tw-shadow-colored: 0 0 #0000;
+        --tw-blur: ;
+        --tw-brightness: ;
+        --tw-contrast: ;
+        --tw-grayscale: ;
+        --tw-hue-rotate: ;
+        --tw-invert: ;
+        --tw-saturate: ;
+        --tw-sepia: ;
+        --tw-drop-shadow: ;
+        --tw-backdrop-blur: ;
+        --tw-backdrop-brightness: ;
+        --tw-backdrop-contrast: ;
+        --tw-backdrop-grayscale: ;
+        --tw-backdrop-hue-rotate: ;
+        --tw-backdrop-invert: ;
+        --tw-backdrop-opacity: ;
+        --tw-backdrop-saturate: ;
+        --tw-backdrop-sepia: ;
+        --tw-contain-size: ;
+        --tw-contain-layout: ;
+        --tw-contain-paint: ;
+        --tw-contain-style: ;
+      }
+      ::backdrop {
+        --tw-border-spacing-x: 0;
+        --tw-border-spacing-y: 0;
+        --tw-translate-x: 0;
+        --tw-translate-y: 0;
+        --tw-rotate: 0;
+        --tw-skew-x: 0;
+        --tw-skew-y: 0;
+        --tw-scale-x: 1;
+        --tw-scale-y: 1;
+        --tw-pan-x: ;
+        --tw-pan-y: ;
+        --tw-pinch-zoom: ;
+        --tw-scroll-snap-strictness: proximity;
+        --tw-gradient-from-position: ;
+        --tw-gradient-via-position: ;
+        --tw-gradient-to-position: ;
+        --tw-ordinal: ;
+        --tw-slashed-zero: ;
+        --tw-numeric-figure: ;
+        --tw-numeric-spacing: ;
+        --tw-numeric-fraction: ;
+        --tw-ring-inset: ;
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-color: rgb(59 130 246 / 0.5);
+        --tw-ring-offset-shadow: 0 0 #0000;
+        --tw-ring-shadow: 0 0 #0000;
+        --tw-shadow: 0 0 #0000;
+        --tw-shadow-colored: 0 0 #0000;
+        --tw-blur: ;
+        --tw-brightness: ;
+        --tw-contrast: ;
+        --tw-grayscale: ;
+        --tw-hue-rotate: ;
+        --tw-invert: ;
+        --tw-saturate: ;
+        --tw-sepia: ;
+        --tw-drop-shadow: ;
+        --tw-backdrop-blur: ;
+        --tw-backdrop-brightness: ;
+        --tw-backdrop-contrast: ;
+        --tw-backdrop-grayscale: ;
+        --tw-backdrop-hue-rotate: ;
+        --tw-backdrop-invert: ;
+        --tw-backdrop-opacity: ;
+        --tw-backdrop-saturate: ;
+        --tw-backdrop-sepia: ;
+        --tw-contain-size: ;
+        --tw-contain-layout: ;
+        --tw-contain-paint: ;
+        --tw-contain-style: ;
+      } /* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */
+      *,
+      ::after,
+      ::before {
+        box-sizing: border-box;
+        border-width: 0;
+        border-style: solid;
+        border-color: #e5e7eb;
+      }
+      ::after,
+      ::before {
+        --tw-content: "";
+      }
+      :host,
+      html {
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+        -moz-tab-size: 4;
+        tab-size: 4;
+        font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+          "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-feature-settings: normal;
+        font-variation-settings: normal;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        margin: 0;
+        line-height: inherit;
+      }
+      hr {
+        height: 0;
+        color: inherit;
+        border-top-width: 1px;
+      }
+      abbr:where([title]) {
+        -webkit-text-decoration: underline dotted;
+        text-decoration: underline dotted;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-size: inherit;
+        font-weight: inherit;
+      }
+      a {
+        color: inherit;
+        text-decoration: inherit;
+      }
+      b,
+      strong {
+        font-weight: bolder;
+      }
+      code,
+      kbd,
+      pre,
+      samp {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-feature-settings: normal;
+        font-variation-settings: normal;
+        font-size: 1em;
+      }
+      small {
+        font-size: 80%;
+      }
+      sub,
+      sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+      }
+      sub {
+        bottom: -0.25em;
+      }
+      sup {
+        top: -0.5em;
+      }
+      table {
+        text-indent: 0;
+        border-color: inherit;
+        border-collapse: collapse;
+      }
+      button,
+      input,
+      optgroup,
+      select,
+      textarea {
+        font-family: inherit;
+        font-feature-settings: inherit;
+        font-variation-settings: inherit;
+        font-size: 100%;
+        font-weight: inherit;
+        line-height: inherit;
+        letter-spacing: inherit;
+        color: inherit;
+        margin: 0;
+        padding: 0;
+      }
+      button,
+      select {
+        text-transform: none;
+      }
+      button,
+      input:where([type="button"]),
+      input:where([type="reset"]),
+      input:where([type="submit"]) {
+        -webkit-appearance: button;
+        background-color: transparent;
+        background-image: none;
+      }
+      :-moz-focusring {
+        outline: auto;
+      }
+      :-moz-ui-invalid {
+        box-shadow: none;
+      }
+      progress {
+        vertical-align: baseline;
+      }
+      ::-webkit-inner-spin-button,
+      ::-webkit-outer-spin-button {
+        height: auto;
+      }
+      [type="search"] {
+        -webkit-appearance: textfield;
+        outline-offset: -2px;
+      }
+      ::-webkit-search-decoration {
+        -webkit-appearance: none;
+      }
+      ::-webkit-file-upload-button {
+        -webkit-appearance: button;
+        font: inherit;
+      }
+      summary {
+        display: list-item;
+      }
+      blockquote,
+      dd,
+      dl,
+      figure,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      hr,
+      p,
+      pre {
+        margin: 0;
+      }
+      fieldset {
+        margin: 0;
+        padding: 0;
+      }
+      legend {
+        padding: 0;
+      }
+      menu,
+      ol,
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      dialog {
+        padding: 0;
+      }
+      textarea {
+        resize: vertical;
+      }
+      input::placeholder,
+      textarea::placeholder {
+        opacity: 1;
+        color: #9ca3af;
+      }
+      [role="button"],
+      button {
+        cursor: pointer;
+      }
+      :disabled {
+        cursor: default;
+      }
+      audio,
+      canvas,
+      embed,
+      iframe,
+      img,
+      object,
+      svg,
+      video {
+        display: block;
+        vertical-align: middle;
+      }
+      img,
+      video {
+        max-width: 100%;
+        height: auto;
+      }
+      [hidden]:where(:not([hidden="until-found"])) {
+        display: none;
+      }
+      .container {
+        width: 100%;
+      }
+      @media (min-width: 640px) {
+        .container {
+          max-width: 640px;
+        }
+      }
+      @media (min-width: 768px) {
+        .container {
+          max-width: 768px;
+        }
+      }
+      @media (min-width: 1024px) {
+        .container {
+          max-width: 1024px;
+        }
+      }
+      @media (min-width: 1280px) {
+        .container {
+          max-width: 1280px;
+        }
+      }
+      @media (min-width: 1536px) {
+        .container {
+          max-width: 1536px;
+        }
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+      .relative {
+        position: relative;
+      }
+      .mx-auto {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .mb-2 {
+        margin-bottom: 0.5rem;
+      }
+      .mb-3 {
+        margin-bottom: 0.75rem;
+      }
+      .mb-8 {
+        margin-bottom: 2rem;
+      }
+      .ml-2 {
+        margin-left: 0.5rem;
+      }
+      .mt-4 {
+        margin-top: 1rem;
+      }
+      .mt-8 {
+        margin-top: 2rem;
+      }
+      .flex {
+        display: flex;
+      }
+      .inline-flex {
+        display: inline-flex;
+      }
+      .grid {
+        display: grid;
+      }
+      .hidden {
+        display: none;
+      }
+      .h-6 {
+        height: 1.5rem;
+      }
+      .max-h-64 {
+        max-height: 16rem;
+      }
+      .min-h-screen {
+        min-height: 100vh;
+      }
+      .w-11 {
+        width: 2.75rem;
+      }
+      .w-full {
+        width: 100%;
+      }
+      .max-w-6xl {
+        max-width: 72rem;
+      }
+      .cursor-pointer {
+        cursor: pointer;
+      }
+      .resize-none {
+        resize: none;
+      }
+      .grid-cols-1 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .justify-between {
+        justify-content: space-between;
+      }
+      .gap-2 {
+        gap: 0.5rem;
+      }
+      .gap-6 {
+        gap: 1.5rem;
+      }
+      .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+      }
+      .overflow-auto {
+        overflow: auto;
+      }
+      .overflow-y-auto {
+        overflow-y: auto;
+      }
+      .whitespace-pre-wrap {
+        white-space: pre-wrap;
+      }
+      .rounded {
+        border-radius: 0.25rem;
+      }
+      .rounded-full {
+        border-radius: 9999px;
+      }
+      .rounded-lg {
+        border-radius: 0.5rem;
+      }
+      .rounded-md {
+        border-radius: 0.375rem;
+      }
+      .border {
+        border-width: 1px;
+      }
+      .border-gray-300 {
+        --tw-border-opacity: 1;
+        border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+      }
+      .bg-gray-200 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
+      }
+      .bg-gray-50 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
+      }
+      .bg-indigo-100 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(224 231 255 / var(--tw-bg-opacity, 1));
+      }
+      .bg-indigo-600 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(79 70 229 / var(--tw-bg-opacity, 1));
+      }
+      .bg-white {
+        --tw-bg-opacity: 1;
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+      }
+      .p-4 {
+        padding: 1rem;
+      }
+      .px-3 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+      .px-4 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .py-1 {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+      }
+      .py-2 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+      .py-8 {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .text-3xl {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+      }
+      .text-lg {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+      }
+      .text-sm {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+      }
+      .font-bold {
+        font-weight: 700;
+      }
+      .font-medium {
+        font-weight: 500;
+      }
+      .font-semibold {
+        font-weight: 600;
+      }
+      .italic {
+        font-style: italic;
+      }
+      .text-gray-500 {
+        --tw-text-opacity: 1;
+        color: rgb(107 114 128 / var(--tw-text-opacity, 1));
+      }
+      .text-gray-600 {
+        --tw-text-opacity: 1;
+        color: rgb(75 85 99 / var(--tw-text-opacity, 1));
+      }
+      .text-gray-700 {
+        --tw-text-opacity: 1;
+        color: rgb(55 65 81 / var(--tw-text-opacity, 1));
+      }
+      .text-green-600 {
+        --tw-text-opacity: 1;
+        color: rgb(22 163 74 / var(--tw-text-opacity, 1));
+      }
+      .text-indigo-700 {
+        --tw-text-opacity: 1;
+        color: rgb(67 56 202 / var(--tw-text-opacity, 1));
+      }
+      .text-white {
+        --tw-text-opacity: 1;
+        color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+      }
+      .shadow-md {
+        --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color),
+          0 2px 4px -2px var(--tw-shadow-color);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+          var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+      }
+      .outline-none {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+      }
+      .transition {
+        transition-property: color, background-color, border-color, fill, stroke,
+          opacity, box-shadow, transform, filter, -webkit-text-decoration-color,
+          -webkit-backdrop-filter;
+        transition-property: color, background-color, border-color,
+          text-decoration-color, fill, stroke, opacity, box-shadow, transform,
+          filter, backdrop-filter;
+        transition-property: color, background-color, border-color,
+          text-decoration-color, fill, stroke, opacity, box-shadow, transform,
+          filter, backdrop-filter, -webkit-text-decoration-color,
+          -webkit-backdrop-filter;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+      }
+      .after\:absolute::after {
+        content: var(--tw-content);
+        position: absolute;
+      }
+      .after\:left-\[2px\]::after {
+        content: var(--tw-content);
+        left: 2px;
+      }
+      .after\:top-\[2px\]::after {
+        content: var(--tw-content);
+        top: 2px;
+      }
+      .after\:h-5::after {
+        content: var(--tw-content);
+        height: 1.25rem;
+      }
+      .after\:w-5::after {
+        content: var(--tw-content);
+        width: 1.25rem;
+      }
+      .after\:rounded-full::after {
+        content: var(--tw-content);
+        border-radius: 9999px;
+      }
+      .after\:border::after {
+        content: var(--tw-content);
+        border-width: 1px;
+      }
+      .after\:border-gray-300::after {
+        content: var(--tw-content);
+        --tw-border-opacity: 1;
+        border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+      }
+      .after\:bg-white::after {
+        content: var(--tw-content);
+        --tw-bg-opacity: 1;
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+      }
+      .after\:transition-all::after {
+        content: var(--tw-content);
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+      }
+      .after\:content-\[\'\'\]::after {
+        --tw-content: "";
+        content: var(--tw-content);
+      }
+      .hover\:bg-gray-300:hover {
+        --tw-bg-opacity: 1;
+        background-color: rgb(209 213 219 / var(--tw-bg-opacity, 1));
+      }
+      .hover\:bg-indigo-200:hover {
+        --tw-bg-opacity: 1;
+        background-color: rgb(199 210 254 / var(--tw-bg-opacity, 1));
+      }
+      .hover\:bg-indigo-700:hover {
+        --tw-bg-opacity: 1;
+        background-color: rgb(67 56 202 / var(--tw-bg-opacity, 1));
+      }
+      .focus\:border-indigo-500:focus {
+        --tw-border-opacity: 1;
+        border-color: rgb(99 102 241 / var(--tw-border-opacity, 1));
+      }
+      .focus\:outline-none:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+      }
+      .focus\:ring-2:focus {
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+          var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+          calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+          var(--tw-shadow, 0 0 #0000);
+      }
+      .focus\:ring-indigo-500:focus {
+        --tw-ring-opacity: 1;
+        --tw-ring-color: rgb(99 102 241 / var(--tw-ring-opacity, 1));
+      }
+      .focus\:ring-offset-2:focus {
+        --tw-ring-offset-width: 2px;
+      }
+      .peer:checked ~ .peer-checked\:bg-indigo-600 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(79 70 229 / var(--tw-bg-opacity, 1));
+      }
+      .peer:checked ~ .peer-checked\:after\:translate-x-full::after {
+        content: var(--tw-content);
+        --tw-translate-x: 100%;
+        transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+          rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+          skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x))
+          scaleY(var(--tw-scale-y));
+      }
+      .peer:checked ~ .peer-checked\:after\:border-white::after {
+        content: var(--tw-content);
+        --tw-border-opacity: 1;
+        border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
+      }
+      .peer:focus ~ .peer-focus\:outline-none {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+      }
+      .peer:focus ~ .peer-focus\:ring-2 {
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+          var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+          calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+          var(--tw-shadow, 0 0 #0000);
+      }
+      .peer:focus ~ .peer-focus\:ring-indigo-500 {
+        --tw-ring-opacity: 1;
+        --tw-ring-color: rgb(99 102 241 / var(--tw-ring-opacity, 1));
+      }
+      @media (min-width: 1024px) {
+        .lg\:grid-cols-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen vsc-initialized">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-indigo-700 mb-2">
+          Formatador de SQL
+        </h1>
+        <p class="text-gray-600">
+          Cole seu código SQL e obtenha uma versão formatada para suas
+          atualizações de sistema
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Entrada SQL -->
+        <div class="bg-white rounded-lg shadow-md p-4">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-lg font-semibold text-gray-700">SQL Original</h2>
+            <button
+              id="clearBtn"
+              class="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 transition"
+            >
+              Limpar
+            </button>
+          </div>
+          <textarea
+            id="sqlInput"
+            class="w-full code-area p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
+            placeholder="Cole seu código SQL aqui..."
+          ></textarea>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button
+              id="formatBtn"
+              class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              Formatar SQL
+            </button>
+          </div>
+        </div>
+
+        <!-- Saída SQL -->
+        <div class="bg-white rounded-lg shadow-md p-4">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-lg font-semibold text-gray-700">SQL Formatado</h2>
+            <div class="flex gap-2">
+              <button
+                id="copyBtn"
+                class="text-sm px-3 py-1 bg-indigo-100 hover:bg-indigo-200 rounded text-indigo-700 transition"
+              >
+                Copiar
+              </button>
+              <span id="copyMessage" class="text-sm text-green-600 hidden"
+                >Copiado!</span
+              >
+            </div>
+          </div>
+          <pre
+            id="sqlOutput"
+            class="w-full code-area p-4 bg-gray-50 border border-gray-300 rounded-md overflow-auto whitespace-pre-wrap"
+          ></pre>
+
+          <div class="mt-4 text-sm text-gray-500">
+            <p id="charCount">Caracteres: 0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="mt-8 bg-white rounded-lg shadow-md p-4">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-semibold text-gray-700">Histórico</h2>
+          <button
+            id="clearHistoryBtn"
+            class="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 transition"
+          >
+            Limpar histórico
+          </button>
+        </div>
+        <div id="history" class="space-y-3 max-h-64 overflow-y-auto">
+          <p class="text-gray-500 text-center italic">
+            Seu histórico aparecerá aqui
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sqlInput = document.getElementById("sqlInput");
+        const sqlOutput = document.getElementById("sqlOutput");
+        const formatBtn = document.getElementById("formatBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const copyMessage = document.getElementById("copyMessage");
+        const charCount = document.getElementById("charCount");
+        const history = document.getElementById("history");
+        const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+
+        // Carregar histórico do localStorage
+        loadHistory();
+
+        formatBtn.addEventListener("click", formatSQL);
+        clearBtn.addEventListener("click", clearInput);
+        copyBtn.addEventListener("click", copyToClipboard);
+        clearHistoryBtn.addEventListener("click", clearHistory);
+
+        sqlInput.addEventListener("input", function () {
+          updateCharCount(sqlInput.value.length);
+        });
+
+        function formatSQL() {
+          if (!sqlInput.value.trim()) {
+            sqlOutput.textContent =
+              "Por favor, insira algum código SQL para formatar.";
+            return;
+          }
+
+          try {
+            let config = {
+              language: "sql",
+              indent: "    ",
+            };
+
+            let formattedSQL = formatarSQL()
+
+            sqlOutput.textContent = formattedSQL;
+
+            // Adicionar ao histórico
+            addToHistory(sqlInput.value, formattedSQL);
+          } catch (error) {
+            sqlOutput.textContent = "Erro ao formatar SQL: " + error.message;
+          }
+        }
+
+        function formatarSQL() {
+          const input = sqlInput.value;
+          const linhas = [];
+
+          // ========================
+          // FORMATAR TODOS OS "ALTER TABLE ... ADD ..."
+          // ========================
+          const alterTableRegexGlobal =
+            /ALTER TABLE\s+\[([^\]]+)\]\s+ADD\s+([\s\S]*?);/gi;
+          let alterMatch;
+          while ((alterMatch = alterTableRegexGlobal.exec(input)) !== null) {
+            const tabela = alterMatch[1];
+            const corpoAdd = alterMatch[2];
+
+            const colunasRegex =
+              /\[([^\]]+)\]\s+([A-Z]+(?:\([^)]+\))?)\s+NULL/gi;
+            let colunaMatch;
+            while ((colunaMatch = colunasRegex.exec(corpoAdd)) !== null) {
+              const nomeColuna = colunaMatch[1];
+              const tipo = colunaMatch[2];
+              const linha = `&sql = " IF NOT EXISTS (SELECT * FROM sys.columns WHERE name = '${nomeColuna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] ADD [${nomeColuna}] ${tipo} NULL; "`;
+              linhas.push(linha);
+              linhas.push(`&sqlCollection.Add(&sql)`);
+              linhas.push(``);
+            }
+          }
+
+          // ========================
+          // FORMATAR TODOS OS "EXEC sp_rename '[Tabela].ColAnt', 'ColNova';"
+          // ========================
+          const renameRegex =
+            /EXEC\s+sp_rename\s+'\[([^\]]+)\]\.([^\']+)'\s*,\s*'([^\']+)';/gi;
+          let renameMatch;
+          while ((renameMatch = renameRegex.exec(input)) !== null) {
+            const tabela = renameMatch[1];
+            const colunaAntiga = renameMatch[2];
+            const colunaNova = renameMatch[3];
+
+            linhas.push(
+              `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${colunaAntiga}' AND object_id = OBJECT_ID('${tabela}')) "`
+            );
+            linhas.push(
+              `&sql += " BEGIN EXEC sp_rename '[${tabela}].${colunaAntiga}', '${colunaNova}', 'COLUMN'; END; "`
+            );
+            linhas.push(`&sqlCollection.Add(&sql)`);
+            linhas.push(``);
+          }
+
+          // ========================
+          // ALTER TABLE ... DROP COLUMN ...
+          // ========================
+          const dropRegex =
+            /ALTER TABLE\s+\[([^\]]+)\]\s+DROP COLUMN\s+([\s\S]*?);/gi;
+          let dropMatch;
+          while ((dropMatch = dropRegex.exec(input)) !== null) {
+            const tabela = dropMatch[1];
+            const colunas = dropMatch[2]
+              .split(",")
+              .map((col) => col.trim())
+              .filter(Boolean)
+              .map((col) => col.replace(/[\[\]]/g, ""));
+
+            colunas.forEach((coluna) => {
+              linhas.push(
+                `&sql = " IF EXISTS (SELECT * FROM sys.columns WHERE name = '${coluna}' AND object_id = OBJECT_ID('${tabela}')) ALTER TABLE [${tabela}] DROP COLUMN [${coluna}]; "`
+              );
+              linhas.push(`&sqlCollection.Add(&sql)`);
+              linhas.push(``);
+            });
+          }
+
+          // ========================
+          // CREATE TABLE ...
+          // ========================
+          const createTableRegex =
+            /CREATE TABLE\s+\[([^\]]+)\]\s*\(([\s\S]*?)\);/gi;
+          let createMatch;
+          while ((createMatch = createTableRegex.exec(input)) !== null) {
+            const tabela = createMatch[1];
+            const corpo = createMatch[2].trim();
+
+            linhas.push(
+              `&sql = " IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = '${tabela}') "`
+            );
+            linhas.push(`&sql += " CREATE TABLE [${tabela}] ( "`);
+
+            // Processa cada linha dentro do corpo
+            const linhasTabela = corpo
+              .split("\n")
+              .map((l) => l.trim())
+              .filter(Boolean);
+
+            linhasTabela.forEach((linha, idx) => {
+              let final = idx === linhasTabela.length - 1 ? " " : " ";
+              const linhaFormatada = linha
+                .replace(/\s+/g, " ")
+                .replace(/,$/, ""); // remove múltiplos espaços e vírgula final
+              linhas.push(`&sql += "   ${linhaFormatada}${final}"`);
+            });
+
+            linhas.push(`&sql += " ); "`);
+            linhas.push(`&sqlCollection.Add(&sql)`);
+            linhas.push(``);
+          }
+
+          // ========================
+          // CREATE NONCLUSTERED INDEX ...
+          // ========================
+          const indexRegex =
+            /CREATE\s+NONCLUSTERED\s+INDEX\s+\[([^\]]+)\]\s+ON\s+\[([^\]]+)\]\s*\((.*?)\)\s*;?/gi;
+          let indexMatch;
+          while ((indexMatch = indexRegex.exec(input)) !== null) {
+            const nomeIndex = indexMatch[1];
+            const tabela = indexMatch[2];
+            const colunasRaw = indexMatch[3]
+              .trim()
+              .replace(/\s+/g, " ") // remove múltiplos espaços
+              .split(",") // separa colunas
+              .map((col) => col.trim().replace(/^\[?(.+?)\]?$/, "[$1]")) // garante colchetes únicos
+              .join(", ");
+
+            let linhaIndex = `&sql = " IF NOT EXISTS (Select * from sys.indexes where name = '${nomeIndex}') `;
+            linhaIndex += `CREATE NONCLUSTERED INDEX [${nomeIndex}] ON [${tabela}] (${colunasRaw})"`; // já com colchetes
+            linhas.push(linhaIndex);
+            linhas.push("&sqlCollection.Add(&sql)");
+          }
+
+          return linhas.length > 0
+              ? linhas.join("\n")
+              : "Nenhuma instrução reconhecida.";
+        }
+
+        function clearInput() {
+          sqlInput.value = "";
+          sqlOutput.textContent = "";
+          updateCharCount(0);
+        }
+
+        function copyToClipboard() {
+          if (!sqlOutput.textContent) return;
+
+          navigator.clipboard
+            .writeText(sqlOutput.textContent)
+            .then(() => {
+              copyMessage.classList.remove("hidden");
+              setTimeout(() => {
+                copyMessage.classList.add("hidden");
+              }, 2000);
+            })
+            .catch((err) => {
+              console.error("Erro ao copiar: ", err);
+            });
+        }
+
+        function updateCharCount(count) {
+          charCount.textContent = `Caracteres: ${count}`;
+        }
+
+        function addToHistory(original, formatted) {
+          const timestamp = new Date().toLocaleString();
+          const historyItem = {
+            timestamp,
+            original,
+            formatted,
+          };
+
+          // Obter histórico existente
+          let historyItems = JSON.parse(
+            localStorage.getItem("sqlFormatterHistory") || "[]"
+          );
+
+          // Adicionar novo item no início
+          historyItems.unshift(historyItem);
+
+          // Limitar a 10 itens
+          if (historyItems.length > 10) {
+            historyItems = historyItems.slice(0, 10);
+          }
+
+          // Salvar no localStorage
+          localStorage.setItem(
+            "sqlFormatterHistory",
+            JSON.stringify(historyItems)
+          );
+
+          // Atualizar a exibição
+          loadHistory();
+        }
+
+        function loadHistory() {
+          const historyItems = JSON.parse(
+            localStorage.getItem("sqlFormatterHistory") || "[]"
+          );
+
+          if (historyItems.length === 0) {
+            history.innerHTML =
+              '<p class="text-gray-500 text-center italic">Seu histórico aparecerá aqui</p>';
+            return;
+          }
+
+          history.innerHTML = "";
+
+          historyItems.forEach((item, index) => {
+            const historyEntry = document.createElement("div");
+            historyEntry.className =
+              "p-3 border border-gray-200 rounded-md hover:bg-gray-50";
+
+            const previewText =
+              item.original.length > 50
+                ? item.original.substring(0, 50) + "..."
+                : item.original;
+
+            historyEntry.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-gray-500">${item.timestamp}</span>
+                            <button class="text-xs text-indigo-600 hover:text-indigo-800 load-history" data-index="${index}">Carregar</button>
+                        </div>
+                        <div class="text-sm font-mono truncate">${previewText}</div>
+                    `;
+
+            history.appendChild(historyEntry);
+          });
+
+          // Adicionar event listeners para os botões de carregar
+          document.querySelectorAll(".load-history").forEach((button) => {
+            button.addEventListener("click", function () {
+              const index = this.getAttribute("data-index");
+              loadHistoryItem(index);
+            });
+          });
+        }
+
+        function loadHistoryItem(index) {
+          const historyItems = JSON.parse(
+            localStorage.getItem("sqlFormatterHistory") || "[]"
+          );
+          const item = historyItems[index];
+
+          if (item) {
+            sqlInput.value = item.original;
+            sqlOutput.textContent = item.formatted;
+            updateCharCount(item.original.length);
+          }
+        }
+
+        function clearHistory() {
+          localStorage.removeItem("sqlFormatterHistory");
+          loadHistory();
+        }
+      });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'93fb097c430577ed',t:'MTc0NzIzMjQzNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+    <iframe
+      height="1"
+      width="1"
+      style="
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        border: none;
+        visibility: hidden;
+      "
+    ></iframe>
+  </body>
+</html>
